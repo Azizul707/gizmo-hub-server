@@ -44,16 +44,32 @@ async function run() {
    
     app.post( '/products', async ( req, res ) => {
       const newProduct = req.body;
+      console.log(newProduct);
       const result = await productsCollection.insertOne( newProduct );
       res.send( result );
     } );
 
     app.post( '/cart', async ( req, res ) => {
       const product = req.body
-      console.log( product );
       const result = await addToCartCollection.insertOne( product );
       res.send( result );
     } );
+
+    app.delete( '/cart/:id', async ( req, res ) => {
+
+      const id = req.params.id;
+      const query = { _id: new ObjectId( id ) };
+      const result = await addToCartCollection.deleteOne( query );
+      res.send( result );
+    } );
+    
+    app.get( '/updateProduct/:id', async ( req, res ) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId( id ) };
+      const result = await productsCollection.findOne( query );
+      res.send( result );
+    })
+
     
     app.get( '/products', async ( req, res ) => {
       const cursor = productsCollection.find();
@@ -75,6 +91,27 @@ async function run() {
       const result = await cursor.toArray();
       res.send( result );
     } );
+
+
+    app.put('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const products = {
+        $set: {
+          name: updatedProduct.name,
+          image: updatedProduct.image,
+          type: updatedProduct.category,
+          price: updatedProduct.price,
+          shortdescription: updatedProduct.description,
+          rating: updatedProduct.rating,
+        },
+      };
+      const result = await productsCollection.updateOne(filter, products, options);
+      res.send(result);
+    });
+    
 
     await client.db("admin").command({ ping: 1 });
     console.log(
