@@ -41,13 +41,7 @@ async function run() {
     const productsCollection = client.db( 'productsDB' ).collection( 'product' );
     const addToCartCollection = client.db('productsDB').collection('addToCart')
     
-    // app.get("/products/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const result = await productsCollection.findOne(query);
-    //   res.send(result);
-    // });
-      
+   
     app.post( '/products', async ( req, res ) => {
       const newProduct = req.body;
       const result = await productsCollection.insertOne( newProduct );
