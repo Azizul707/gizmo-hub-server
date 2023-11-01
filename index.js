@@ -8,6 +8,8 @@ const port = process.env.PORT || 5000;
 app.use( cors() );
 
 app.use( express.json() );
+require('dotenv').config();
+
 
 
 
@@ -24,7 +26,7 @@ app.listen(port, () => {
 
 
 const uri =
-  "mongodb+srv://gizmohub:0HI9Ttvw5ySno1Zo@cluster0.hg5h0d4.mongodb.net/?retryWrites=true&w=majority";
+  `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hg5h0d4.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -44,7 +46,6 @@ async function run() {
    
     app.post( '/products', async ( req, res ) => {
       const newProduct = req.body;
-      console.log(newProduct);
       const result = await productsCollection.insertOne( newProduct );
       res.send( result );
     } );
@@ -84,7 +85,7 @@ async function run() {
     } );
 
 
-    app.get( '/products/:brand', async ( req, res ) => {
+    app.get( '/products/select/:brand', async ( req, res ) => {
       const brand = req.params.brand;
       const query = { brandname: brand };
       const cursor = productsCollection.find( query );
